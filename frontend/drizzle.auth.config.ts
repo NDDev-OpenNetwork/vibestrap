@@ -1,7 +1,6 @@
-import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
-config({ path: [".env.local", ".env"], quiet: true });
+import { serverEnv } from "./src/shared/config/index.server";
 
 export default defineConfig({
   out: "./drizzle/auth",
@@ -9,9 +8,5 @@ export default defineConfig({
   dialect: "postgresql",
   schemaFilter: ["auth"],
   migrations: { schema: "auth", table: "__drizzle_migrations" },
-  dbCredentials: {
-    url:
-      process.env.AUTH_DATABASE_URL ??
-      "postgresql://vibestrap:vibestrap@localhost:5432/vibestrap",
-  },
+  dbCredentials: { url: serverEnv.authDatabaseUrl },
 });

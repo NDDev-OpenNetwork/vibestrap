@@ -11,7 +11,7 @@ from vibestrap.api.router import router as api_router
 from vibestrap.auth.jwt import TokenVerifier
 from vibestrap.core.config import Settings
 from vibestrap.core.errors import ErrorResponse, register_error_handlers
-from vibestrap.core.logging import configure_logging
+from vibestrap.core.logging import RequestIdMiddleware, configure_logging
 from vibestrap.db.session import create_engine
 
 
@@ -38,12 +38,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
         responses={500: {"model": ErrorResponse}, 422: {"model": ErrorResponse}},
     )
+    app.add_middleware(RequestIdMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=config.cors_origins,
         allow_credentials=False,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["Authorization", "Content-Type"],
+        allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+        expose_headers=["X-Request-ID"],
     )
     register_error_handlers(app)
     app.include_router(health_router)

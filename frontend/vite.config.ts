@@ -7,8 +7,13 @@ import { defineConfig } from "vite";
 
 import { paraglideConfig } from "./paraglide.config.ts";
 
+// Ports come from the root .env so a worktree can run its own stack without clashing.
+const port = Number(process.env.FRONTEND_PORT ?? 3000);
+
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
+  server: { port, strictPort: true },
+  preview: { port, strictPort: true },
   plugins: [
     paraglideVitePlugin(paraglideConfig),
     tailwindcss(),

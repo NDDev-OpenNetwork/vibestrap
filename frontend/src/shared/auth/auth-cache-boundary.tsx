@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 
+import { forgetAccessToken } from "../api/backend-client";
 import { authClient } from "./auth-client";
 
 /** Prevent private cached data from surviving logout or a switch to another session. */
@@ -20,6 +21,7 @@ export const AuthCacheBoundary = ({
       return;
     }
     if (previous.current !== null && previous.current.sessionId !== identity) {
+      forgetAccessToken();
       queryClient.clear();
     }
     previous.current = { sessionId: identity };

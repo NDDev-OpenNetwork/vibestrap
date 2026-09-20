@@ -2,6 +2,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from vibestrap.auth.policy import Permission, Role
 
+# `strict=True` is safe here: these models are built in Python, never parsed from a request
+# body. A request DTO with an enum field must not use it — see core/schemas.py.
+
 
 class TokenIdentity(BaseModel):
     model_config = ConfigDict(strict=True)

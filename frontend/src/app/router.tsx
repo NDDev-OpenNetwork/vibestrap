@@ -7,6 +7,7 @@ import {
   RouteNotFound,
   RoutePending,
 } from "#/shared/ui/route-states";
+import { Toaster } from "#/shared/ui/shadcn/toast";
 
 import { createQueryClient } from "./providers/query-client";
 import { routeTree } from "./routeTree.gen";
@@ -21,7 +22,9 @@ export const getRouter = () => {
     defaultNotFoundComponent: RouteNotFound,
     Wrap: ({ children }) => (
       <QueryClientProvider client={queryClient}>
-        <AuthCacheBoundary>{children}</AuthCacheBoundary>
+        <Toaster>
+          <AuthCacheBoundary>{children}</AuthCacheBoundary>
+        </Toaster>
       </QueryClientProvider>
     ),
     scrollRestoration: true,
