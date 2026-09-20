@@ -9,7 +9,9 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from vibestrap.core.config import Settings
 from vibestrap.db.base import Base
 
-# Import domain model modules here so their tables are registered in Base.metadata.
+# Import every domain model module here so its tables are registered in Base.metadata.
+from vibestrap.modules.notes import models as notes_models  # noqa: F401
+
 target_metadata = Base.metadata
 
 
@@ -31,6 +33,7 @@ def configure(connection: Connection | None = None, url: str | None = None) -> N
         version_table="vibestrap_alembic_version",
         version_table_schema="public",
         compare_type=True,
+        compare_server_default=True,
         literal_binds=connection is None,
     )
     with context.begin_transaction():

@@ -17,10 +17,16 @@ const mutationSchema = z.object({
 });
 
 export const guardAdminChanges = createAuthMiddleware(async (context) => {
+  // `/admin/update-user` can also write `role`, so it belongs here even though the
+  // access-control statements do not grant `user:update` today.
   if (
-    !["/admin/set-role", "/admin/create-user", "/admin/ban-user"].includes(
-      context.path
-    )
+    ![
+      "/admin/set-role",
+      "/admin/create-user",
+      "/admin/update-user",
+      "/admin/remove-user",
+      "/admin/ban-user",
+    ].includes(context.path)
   ) {
     return;
   }

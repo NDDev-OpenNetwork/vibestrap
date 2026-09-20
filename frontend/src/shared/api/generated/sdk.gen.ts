@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetAccessPolicyData, GetAccessPolicyErrors, GetAccessPolicyResponses, GetCurrentUserData, GetCurrentUserErrors, GetCurrentUserResponses, GetLivenessData, GetLivenessErrors, GetLivenessResponses, GetReadinessData, GetReadinessErrors, GetReadinessResponses } from './types.gen';
+import type { CreateNoteData, CreateNoteErrors, CreateNoteResponses, DeleteNoteData, DeleteNoteErrors, DeleteNoteResponses, GetAccessPolicyData, GetAccessPolicyErrors, GetAccessPolicyResponses, GetCurrentUserData, GetCurrentUserErrors, GetCurrentUserResponses, GetLivenessData, GetLivenessErrors, GetLivenessResponses, GetNoteData, GetNoteErrors, GetNoteResponses, GetReadinessData, GetReadinessErrors, GetReadinessResponses, ListNotesData, ListNotesErrors, ListNotesResponses, UpdateNoteData, UpdateNoteErrors, UpdateNoteResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -38,6 +38,61 @@ export const getCurrentUser = <ThrowOnError extends boolean = false>(options?: O
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/me',
     ...options
+});
+
+/**
+ * List Notes
+ *
+ * List the caller's notes, newest first.
+ */
+export const listNotes = <ThrowOnError extends boolean = false>(options?: Options<ListNotesData, ThrowOnError>): RequestResult<ListNotesResponses, ListNotesErrors, ThrowOnError> => (options?.client ?? client).get<ListNotesResponses, ListNotesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/notes',
+    ...options
+});
+
+/**
+ * Create Note
+ */
+export const createNote = <ThrowOnError extends boolean = false>(options: Options<CreateNoteData, ThrowOnError>): RequestResult<CreateNoteResponses, CreateNoteErrors, ThrowOnError> => (options.client ?? client).post<CreateNoteResponses, CreateNoteErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/notes',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete Note
+ */
+export const deleteNote = <ThrowOnError extends boolean = false>(options: Options<DeleteNoteData, ThrowOnError>): RequestResult<DeleteNoteResponses, DeleteNoteErrors, ThrowOnError> => (options.client ?? client).delete<DeleteNoteResponses, DeleteNoteErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/notes/{note_id}',
+    ...options
+});
+
+/**
+ * Get Note
+ */
+export const getNote = <ThrowOnError extends boolean = false>(options: Options<GetNoteData, ThrowOnError>): RequestResult<GetNoteResponses, GetNoteErrors, ThrowOnError> => (options.client ?? client).get<GetNoteResponses, GetNoteErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/notes/{note_id}',
+    ...options
+});
+
+/**
+ * Update Note
+ */
+export const updateNote = <ThrowOnError extends boolean = false>(options: Options<UpdateNoteData, ThrowOnError>): RequestResult<UpdateNoteResponses, UpdateNoteErrors, ThrowOnError> => (options.client ?? client).patch<UpdateNoteResponses, UpdateNoteErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/notes/{note_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**

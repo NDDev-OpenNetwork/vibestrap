@@ -6,8 +6,10 @@ from vibestrap.auth.dependencies import require_permissions
 from vibestrap.auth.policy import Permission, Role, permissions_for
 from vibestrap.auth.schemas import AccessPolicy, CurrentUser
 from vibestrap.core.errors import ErrorResponse
+from vibestrap.modules.notes.router import router as notes_router
 
 router = APIRouter(prefix="/api/v1")
+router.include_router(notes_router)
 
 
 @router.get(

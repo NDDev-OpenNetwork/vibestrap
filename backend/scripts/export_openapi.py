@@ -20,7 +20,10 @@ def main() -> None:
     content = json.dumps(schema, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
     if args.check:
         if not args.output.exists() or args.output.read_text() != content:
-            parser.exit(1, "OpenAPI contract is stale. Run scripts/export_openapi.py.\n")
+            parser.exit(
+                1,
+                "OpenAPI contract is stale. Run `bun run api:generate` from the repository root.\n",
+            )
         return
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(content)

@@ -1,5 +1,6 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { House, LogOut, Menu, X } from "lucide-react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { House, LogOut, Menu, NotebookPen, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
 import type { ReactNode } from "react";
 
@@ -17,26 +18,60 @@ import {
 } from "#/shared/ui/shadcn/sheet";
 import ThemeToggle from "#/shared/ui/theme-toggle";
 
+type NavigationItem = {
+  to: "/" | "/notes";
+  icon: LucideIcon;
+  label: () => string;
+  exact?: boolean;
+};
+
+/** Add a page here and it appears in the sidebar, the mobile menu and the header title. */
+const navigation: NavigationItem[] = [
+  { to: "/", icon: House, label: () => m.home_page(), exact: true },
+  { to: "/notes", icon: NotebookPen, label: () => m.notes_page() },
+];
+
+const linkClassName =
+  "flex min-h-10 items-center gap-2 rounded-md px-3 text-muted-foreground text-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2";
+const activeProps = {
+  className: "bg-accent font-medium text-accent-foreground",
+  "aria-current": "page",
+} as const;
+
 const Navigation = ({ onNavigate }: { onNavigate?: () => void }) => (
-  <nav aria-label={m.app_navigation()} className="p-3">
-    <Link
-      to="/"
-      onClick={onNavigate}
-      activeOptions={{ exact: true }}
-      className="flex min-h-10 items-center gap-2 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2"
-      activeProps={{
-        className: "bg-accent font-medium text-accent-foreground",
-        "aria-current": "page",
-      }}
-    >
-      <House className="size-4" aria-hidden="true" />
-      {m.home_page()}
-    </Link>
+  <nav aria-label={m.app_navigation()} className="grid gap-1 p-3">
+    {navigation.map(({ to, icon: Icon, label, exact }) => (
+      <Link
+        key={to}
+        to={to}
+        onClick={onNavigate}
+        activeOptions={exact ? { exact: true } : undefined}
+        className={linkClassName}
+        activeProps={activeProps}
+      >
+        <Icon className="size-4" aria-hidden="true" />
+        {label()}
+      </Link>
+    ))}
   </nav>
 );
 
+const useCurrentPageLabel = () => {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const match = navigation
+    .filter(
+      (item) =>
+        pathname === item.to || (!item.exact && pathname.startsWith(item.to))
+    )
+    .at(-1);
+  return match?.label() ?? m.home_page();
+};
+
 export const AppShell = ({ children }: { children: ReactNode }) => {
   const { data: session } = authClient.useSession();
+  const pageLabel = useCurrentPageLabel();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -108,9 +143,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
                 <Navigation onNavigate={() => setMenuOpen(false)} />
               </SheetContent>
             </Sheet>
-            <span className="text-sm text-muted-foreground">
-              {m.home_page()}
-            </span>
+            <span className="text-sm text-muted-foreground">{pageLabel}</span>
           </div>
           <div className="flex items-center gap-1">
             <LocaleSwitcher />

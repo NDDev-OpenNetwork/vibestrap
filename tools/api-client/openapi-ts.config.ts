@@ -10,6 +10,8 @@ export default defineConfig({
     "@hey-api/typescript",
     "@hey-api/client-fetch",
     "@hey-api/sdk",
-    "@tanstack/react-query",
+    // `tags` puts the OpenAPI tag into every query key, so one mutation can
+    // invalidate a whole resource: invalidateQueries({ queryKey: [{ tags: ["notes"] }] }).
+    { name: "@tanstack/react-query", queryKeys: { tags: true } },
   ],
 });

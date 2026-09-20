@@ -77,9 +77,99 @@ export type HealthResponse = {
 };
 
 /**
+ * NoteCreate
+ */
+export type NoteCreate = {
+    /**
+     * Body
+     */
+    body?: string | null;
+    /**
+     * Pinned
+     */
+    pinned?: boolean;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * NoteRead
+ */
+export type NoteRead = {
+    /**
+     * Body
+     */
+    body: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Pinned
+     */
+    pinned: boolean;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+};
+
+/**
+ * NoteUpdate
+ *
+ * Only the keys present in the request are written. `null` clears `body` only.
+ */
+export type NoteUpdate = {
+    /**
+     * Body
+     */
+    body?: string | null;
+    /**
+     * Pinned
+     */
+    pinned?: boolean | null;
+    /**
+     * Title
+     */
+    title?: string | null;
+};
+
+/**
+ * PageNoteRead
+ */
+export type PageNoteRead = {
+    /**
+     * Items
+     */
+    items: Array<NoteRead>;
+    /**
+     * Limit
+     */
+    limit: number;
+    /**
+     * Offset
+     */
+    offset: number;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
  * Permission
  */
-export type Permission = 'profile:read' | 'access:read' | 'users:read' | 'users:manage' | 'sessions:revoke';
+export type Permission = 'profile:read' | 'notes:read' | 'notes:write' | 'access:read' | 'users:read' | 'users:manage' | 'sessions:revoke';
 
 /**
  * Role
@@ -185,6 +275,231 @@ export type GetCurrentUserResponses = {
 };
 
 export type GetCurrentUserResponse = GetCurrentUserResponses[keyof GetCurrentUserResponses];
+
+export type ListNotesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Pinned
+         */
+        pinned?: boolean | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/v1/notes';
+};
+
+export type ListNotesErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Unprocessable Content
+     */
+    422: ErrorResponse;
+    /**
+     * Internal Server Error
+     */
+    500: ErrorResponse;
+};
+
+export type ListNotesError = ListNotesErrors[keyof ListNotesErrors];
+
+export type ListNotesResponses = {
+    /**
+     * Successful Response
+     */
+    200: PageNoteRead;
+};
+
+export type ListNotesResponse = ListNotesResponses[keyof ListNotesResponses];
+
+export type CreateNoteData = {
+    body: NoteCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/notes';
+};
+
+export type CreateNoteErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Unprocessable Content
+     */
+    422: ErrorResponse;
+    /**
+     * Internal Server Error
+     */
+    500: ErrorResponse;
+};
+
+export type CreateNoteError = CreateNoteErrors[keyof CreateNoteErrors];
+
+export type CreateNoteResponses = {
+    /**
+     * Successful Response
+     */
+    201: NoteRead;
+};
+
+export type CreateNoteResponse = CreateNoteResponses[keyof CreateNoteResponses];
+
+export type DeleteNoteData = {
+    body?: never;
+    path: {
+        /**
+         * Note Id
+         */
+        note_id: string;
+    };
+    query?: never;
+    url: '/api/v1/notes/{note_id}';
+};
+
+export type DeleteNoteErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+    /**
+     * Unprocessable Content
+     */
+    422: ErrorResponse;
+    /**
+     * Internal Server Error
+     */
+    500: ErrorResponse;
+};
+
+export type DeleteNoteError = DeleteNoteErrors[keyof DeleteNoteErrors];
+
+export type DeleteNoteResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteNoteResponse = DeleteNoteResponses[keyof DeleteNoteResponses];
+
+export type GetNoteData = {
+    body?: never;
+    path: {
+        /**
+         * Note Id
+         */
+        note_id: string;
+    };
+    query?: never;
+    url: '/api/v1/notes/{note_id}';
+};
+
+export type GetNoteErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+    /**
+     * Unprocessable Content
+     */
+    422: ErrorResponse;
+    /**
+     * Internal Server Error
+     */
+    500: ErrorResponse;
+};
+
+export type GetNoteError = GetNoteErrors[keyof GetNoteErrors];
+
+export type GetNoteResponses = {
+    /**
+     * Successful Response
+     */
+    200: NoteRead;
+};
+
+export type GetNoteResponse = GetNoteResponses[keyof GetNoteResponses];
+
+export type UpdateNoteData = {
+    body: NoteUpdate;
+    path: {
+        /**
+         * Note Id
+         */
+        note_id: string;
+    };
+    query?: never;
+    url: '/api/v1/notes/{note_id}';
+};
+
+export type UpdateNoteErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+    /**
+     * Unprocessable Content
+     */
+    422: ErrorResponse;
+    /**
+     * Internal Server Error
+     */
+    500: ErrorResponse;
+};
+
+export type UpdateNoteError = UpdateNoteErrors[keyof UpdateNoteErrors];
+
+export type UpdateNoteResponses = {
+    /**
+     * Successful Response
+     */
+    200: NoteRead;
+};
+
+export type UpdateNoteResponse = UpdateNoteResponses[keyof UpdateNoteResponses];
 
 export type GetLivenessData = {
     body?: never;

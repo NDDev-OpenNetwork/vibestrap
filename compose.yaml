@@ -1,11 +1,12 @@
-name: vibestrap
+# Override COMPOSE_PROJECT_NAME per worktree so parallel checkouts get their own containers.
+name: ${COMPOSE_PROJECT_NAME:-vibestrap}
 
 x-backend: &backend
   image: vibestrap-backend:local
   build: ./backend
   environment:
     BACKEND_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vibestrap}:${POSTGRES_PASSWORD:-vibestrap}@postgres:5432/${POSTGRES_DB:-vibestrap}
-    BACKEND_AUTH_JWKS_URL: ${BACKEND_DOCKER_AUTH_JWKS_URL:-http://host.docker.internal:3000/api/auth/jwks}
+    BACKEND_AUTH_JWKS_URL: ${BACKEND_DOCKER_AUTH_JWKS_URL:-http://frontend:3000/api/auth/jwks}
     BACKEND_AUTH_ISSUER: ${BACKEND_AUTH_ISSUER:-http://localhost:3000}
     BACKEND_AUTH_AUDIENCE: ${BACKEND_AUTH_AUDIENCE:-vibestrap-api}
     BACKEND_CORS_ORIGINS: '${BACKEND_CORS_ORIGINS:-["http://localhost:3000"]}'
@@ -30,7 +31,7 @@ services:
       retries: 10
 
   migrate:
-    profiles: [backend]
+    profiles: [app]
     <<: *backend
     command: ["alembic", "upgrade", "head"]
     depends_on:
@@ -38,7 +39,7 @@ services:
         condition: service_healthy
 
   backend:
-    profiles: [backend]
+    profiles: [app]
     <<: *backend
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
@@ -47,6 +48,45 @@ services:
         condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 5
+
+  # Drizzle owns the `auth` schema and only exists in the build stage, which has the dev tools.
+  auth-migrate:
+    profiles: [app]
+    build:
+      context: ./frontend
+      # `deps` stops before the frontend build: drizzle-kit only needs the dependencies.
+      target: deps
+    environment:
+      AUTH_DATABASE_URL: postgresql://${POSTGRES_USER:-vibestrap}:${POSTGRES_PASSWORD:-vibestrap}@postgres:5432/${POSTGRES_DB:-vibestrap}
+    command: ["bun", "run", "auth:db:migrate"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    profiles: [app]
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    environment:
+      FRONTEND_PORT: 3000
+      AUTH_DATABASE_URL: postgresql://${POSTGRES_USER:-vibestrap}:${POSTGRES_PASSWORD:-vibestrap}@postgres:5432/${POSTGRES_DB:-vibestrap}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?run `bun run setup` first}
+      BETTER_AUTH_JWT_AUDIENCE: ${BETTER_AUTH_JWT_AUDIENCE:-vibestrap-api}
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+      auth-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "bun", "-e", "await fetch('http://127.0.0.1:3000/')"]
       interval: 10s
       timeout: 6s
       retries: 5
