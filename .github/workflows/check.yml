@@ -1,0 +1,32 @@
+name: Check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.13"
+          enable-cache: true
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: ".bun-version"
+      - run: bun run setup
+      - run: bun run verify
+      - run: bun run test:integration
+      - name: Check generated contract and client
+        run: |
+          bun run api:generate
+          test -z "$(git status --porcelain -- contracts/openapi.json frontend/src/shared/api/generated)"
+      - name: Build backend container
+        run: docker build -t vibestrap-backend:ci backend
+      - if: always()
+        run: docker compose down -v

@@ -1,0 +1,6 @@
+.vscode/
+.tsprofiles/
+.env
+.env.*
+!.env.example
+node_modules/

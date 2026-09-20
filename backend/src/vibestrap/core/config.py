@@ -1,0 +1,19 @@
+from pydantic import Field, PostgresDsn
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file="../.env", env_prefix="BACKEND_", extra="ignore")
+
+    database_url: PostgresDsn = PostgresDsn(
+        "postgresql+asyncpg://vibestrap:vibestrap@localhost:5432/vibestrap"
+    )
+    cors_origins: list[str] = ["http://localhost:3000"]
+    auth_jwks_url: str = "http://localhost:3000/api/auth/jwks"
+    auth_issuer: str = "http://localhost:3000"
+    auth_audience: str = "vibestrap-api"
+    jwks_cache_seconds: int = Field(default=300, ge=1)
+    jwks_refresh_cooldown_seconds: int = Field(default=5, ge=1)
+    http_timeout_seconds: float = Field(default=5, gt=0)
+    database_timeout_seconds: float = Field(default=5, gt=0)
+    log_level: str = "INFO"

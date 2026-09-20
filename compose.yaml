@@ -1,0 +1,55 @@
+name: vibestrap
+
+x-backend: &backend
+  image: vibestrap-backend:local
+  build: ./backend
+  environment:
+    BACKEND_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vibestrap}:${POSTGRES_PASSWORD:-vibestrap}@postgres:5432/${POSTGRES_DB:-vibestrap}
+    BACKEND_AUTH_JWKS_URL: ${BACKEND_DOCKER_AUTH_JWKS_URL:-http://host.docker.internal:3000/api/auth/jwks}
+    BACKEND_AUTH_ISSUER: ${BACKEND_AUTH_ISSUER:-http://localhost:3000}
+    BACKEND_AUTH_AUDIENCE: ${BACKEND_AUTH_AUDIENCE:-vibestrap-api}
+    BACKEND_CORS_ORIGINS: '${BACKEND_CORS_ORIGINS:-["http://localhost:3000"]}'
+  extra_hosts:
+    - host.docker.internal:host-gateway
+
+services:
+  postgres:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vibestrap}
+      POSTGRES_USER: ${POSTGRES_USER:-vibestrap}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vibestrap}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    profiles: [backend]
+    <<: *backend
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    profiles: [backend]
+    <<: *backend
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 5
+
+volumes:
+  postgres_data:
