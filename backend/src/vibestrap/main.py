@@ -15,7 +15,7 @@ from vibestrap.core.logging import configure_logging
 from vibestrap.db.session import create_engine
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_api(settings: Settings | None = None) -> FastAPI:
     config = settings if settings is not None else Settings()
 
     @asynccontextmanager
@@ -38,14 +38,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
         responses={500: {"model": ErrorResponse}, 422: {"model": ErrorResponse}},
     )
-    app.add_middleware(
-        CORSMiddleware,
+    register_error_handlers(app)
+    app.include_router(health_router)
+    app.include_router(api_router)
+    return app
+
+
+def create_app(settings: Settings | None = None) -> CORSMiddleware:
+    config = settings if settings is not None else Settings()
+    # Wrap ServerErrorMiddleware too, so browsers can read unexpected error responses.
+    return CORSMiddleware(
+        create_api(config),
         allow_origins=config.cors_origins,
         allow_credentials=False,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type"],
     )
-    register_error_handlers(app)
-    app.include_router(health_router)
-    app.include_router(api_router)
-    return app

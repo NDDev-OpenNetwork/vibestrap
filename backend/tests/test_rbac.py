@@ -4,12 +4,12 @@ from fastapi.testclient import TestClient
 from vibestrap.auth.dependencies import get_current_user, require_permissions
 from vibestrap.auth.policy import Permission, Role, permissions_for
 from vibestrap.auth.schemas import CurrentUser
-from vibestrap.main import create_app
+from vibestrap.main import create_api, create_app
 
 
 @pytest.mark.parametrize("role,status", [(Role.USER, 403), (Role.ADMIN, 200)])
 def test_admin_endpoint_requires_permission(settings, role, status):
-    app = create_app(settings)
+    app = create_api(settings)
     app.dependency_overrides[get_current_user] = lambda: CurrentUser(
         id="test-user", role=role, permissions=permissions_for(role)
     )

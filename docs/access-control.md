@@ -43,5 +43,16 @@ JWT действует 5 минут. FastAPI проверяет подпись �
 `backendClient` получает JWT через cookie-сессию; серверный код использует
 `createBackendClient` с токеном конкретного запроса.
 
+В сгенерированных Query options ключ — tuple из одного объекта. Для приватных
+запросов добавляйте идентификатор сессии в `tags`, сохраняя форму ключа:
+
+```ts
+const options = getCurrentUserOptions({ client: backendClient });
+options.queryKey[0].tags = [sessionId ?? "anonymous"];
+const query = useQuery({ ...options, enabled: Boolean(sessionId) });
+```
+
+Используйте такой же ключ при invalidation; токен доступа в ключ не включайте.
+
 `bun run test:integration` проверяет миграции и реальную авторизацию в одноразовой
 БД, затем удаляет её.

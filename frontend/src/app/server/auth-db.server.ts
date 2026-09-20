@@ -1,10 +1,7 @@
-import { config } from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 import { account, jwks, session, user, verification } from "./auth-schema";
-
-config({ path: [".env.local", ".env"], quiet: true });
 
 export const authPool = new Pool({
   connectionString:

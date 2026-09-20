@@ -2,14 +2,11 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, jwt } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
-import { config } from "dotenv";
 
 import { adminAccessControl, adminRoles } from "#/shared/auth/index.server";
 
 import { authDb } from "./auth-db.server";
 import { guardAdminChanges } from "./auth-guards.server";
-
-config({ path: [".env.local", ".env"], quiet: true });
 
 const authBaseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
 

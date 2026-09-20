@@ -9,7 +9,7 @@ from vibestrap.auth.jwt import TokenVerifier
 from vibestrap.auth.policy import Role, permissions_for
 from vibestrap.auth.schemas import CurrentUser
 from vibestrap.core.config import Settings
-from vibestrap.main import create_app
+from vibestrap.main import create_api, create_app
 
 
 def test_liveness_auth_and_contract_without_external_services(settings):
@@ -33,7 +33,7 @@ async def test_protected_endpoint(settings, jwks, make_token, monkeypatch):
     )
     lookup = AsyncMock(return_value=current)
     monkeypatch.setattr("vibestrap.auth.dependencies.load_current_user", lookup)
-    app = create_app(settings)
+    app = create_api(settings)
     async with app.router.lifespan_context(app):
         async with httpx.AsyncClient(
             transport=httpx.MockTransport(lambda _: httpx.Response(200, json=jwks))
@@ -80,8 +80,28 @@ def test_cors_preflight(settings):
         assert denied.status_code == 400
 
 
+def test_cors_on_unexpected_errors(settings):
+    app = create_app(settings)
+
+    @app.app.get("/_error_probe")
+    async def error_probe():
+        raise RuntimeError("Internal details must not reach the client")
+
+    with TestClient(app, raise_server_exceptions=False) as client:
+        response = client.get("/_error_probe", headers={"Origin": settings.cors_origins[0]})
+        assert response.status_code == 500
+        assert response.headers["access-control-allow-origin"] == settings.cors_origins[0]
+        assert response.json()["error"] == {
+            "code": "internal_error",
+            "message": "An unexpected error occurred",
+            "details": None,
+        }
+        denied = client.get("/_error_probe", headers={"Origin": "https://untrusted.example"})
+        assert "access-control-allow-origin" not in denied.headers
+
+
 def test_openapi_contract():
-    schema = create_app(Settings.model_construct()).openapi()
+    schema = create_api(Settings.model_construct()).openapi()
     expected = json.loads(
         (Path(__file__).resolve().parents[2] / "contracts/openapi.json").read_text()
     )

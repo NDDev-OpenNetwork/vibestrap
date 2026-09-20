@@ -21,9 +21,10 @@ export const useAccess = () => {
   const session = authClient.useSession();
   const query = useQuery({
     queryKey: [...accessQueryKey, session.data?.session.id ?? null],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const { data } = await getCurrentUser({
         client: backendClient,
+        signal,
         throwOnError: true,
       });
       return data;

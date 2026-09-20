@@ -1,7 +1,6 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 
-import { AuthCacheBoundary } from "#/shared/auth";
 import {
   RouteError,
   RouteNotFound,
@@ -20,9 +19,7 @@ export const getRouter = () => {
     defaultErrorComponent: RouteError,
     defaultNotFoundComponent: RouteNotFound,
     Wrap: ({ children }) => (
-      <QueryClientProvider client={queryClient}>
-        <AuthCacheBoundary>{children}</AuthCacheBoundary>
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     ),
     scrollRestoration: true,
     defaultPreload: "intent",

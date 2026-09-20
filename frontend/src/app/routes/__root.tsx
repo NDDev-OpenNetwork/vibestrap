@@ -2,6 +2,7 @@ import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 
+import { AuthCacheBoundary } from "#/shared/auth";
 import { env } from "#/shared/config";
 import { getLocale } from "#/shared/lib/i18n/runtime";
 
@@ -35,7 +36,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <AuthCacheBoundary>{children}</AuthCacheBoundary>
         <Scripts />
       </body>
     </html>

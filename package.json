@@ -13,7 +13,7 @@
     "infra:stop": "docker compose stop postgres",
     "migrate": "bun --env-file=.env run migrate:all",
     "check": "bun --env-file=../.env run --cwd frontend typecheck && bun --env-file=../.env run --cwd frontend check && bun --env-file=../.env run --cwd frontend lint:fsd && uv run --directory backend ruff check . && uv run --directory backend ruff format --check . && uv run --directory backend mypy && uv run --directory backend python scripts/export_openapi.py --check",
-    "fix": "bun --env-file=../.env run --cwd frontend fix && uv run --directory backend ruff check --fix . && uv run --directory backend ruff format .",
+    "fix": "bun --env-file=../.env run --cwd frontend fix && uv run --directory backend ruff format . && uv run --directory backend ruff check --fix . && uv run --directory backend ruff format .",
     "test": "bun --env-file=../.env run --cwd frontend test:auth && uv run --directory backend pytest",
     "test:integration": "bun run frontend/scripts/test-integration.ts",
     "build": "bun --env-file=../.env run --cwd frontend build && uv build --directory backend",

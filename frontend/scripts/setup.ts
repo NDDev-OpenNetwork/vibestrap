@@ -21,7 +21,21 @@ if (!(await environment.exists())) {
   );
   process.stdout.write("Created root .env with a random auth secret.\n");
 } else {
-  process.stdout.write("Keeping existing root .env.\n");
+  const existing = await environment.text();
+  const emptySecret = /^BETTER_AUTH_SECRET=(?:""|'')?[ \t]*(?:#.*)?$/m;
+  if (emptySecret.test(existing) || !/^BETTER_AUTH_SECRET=/m.test(existing)) {
+    const secret = `BETTER_AUTH_SECRET=${randomBytes(32).toString("hex")}`;
+    await writeFile(
+      `${root}.env`,
+      emptySecret.test(existing)
+        ? existing.replace(emptySecret, secret)
+        : `${existing.trimEnd()}\n${secret}\n`,
+      { mode: 0o600 }
+    );
+    process.stdout.write("Filled missing auth secret in root .env.\n");
+  } else {
+    process.stdout.write("Keeping existing root .env.\n");
+  }
 }
 
 const install = Bun.spawn(["bun", "run", "install:all"], {

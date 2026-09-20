@@ -15,7 +15,7 @@ export default defineConfig({
     "typescript/no-floating-promises": "error",
     "typescript/no-misused-promises": "error",
     "react-hooks/exhaustive-deps": "error",
-    "react/exhaustive-effect-dependencies": "off", // Covered by exhaustive-deps; scroll effects intentionally depend on messages.
+    "react/exhaustive-effect-dependencies": "off", // Covered by exhaustive-deps.
   },
   ignorePatterns: [
     "dist/**",

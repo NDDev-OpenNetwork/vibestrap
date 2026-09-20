@@ -11,6 +11,8 @@ bun run dev      # frontend + backend
 UI: http://localhost:3000 · API: http://localhost:8000/docs.
 Настройки — в корневом `.env`. Повторный setup сохраняет секрет и данные.
 Ctrl+C останавливает приложения; PostgreSQL остаётся запущенным.
+Для параллельной копии задайте в её `.env` уникальные `COMPOSE_PROJECT_NAME`,
+`POSTGRES_PORT`, `FRONTEND_PORT`, `BACKEND_PORT` перед setup.
 
 | Из корня | Действие |
 | --- | --- |
@@ -28,3 +30,7 @@ Better Auth в TanStack Start владеет аккаунтами и сесси�
 через регистрацию. Языки: `ru` (по умолчанию), `kk` (KZ), `en`.
 
 [Правила доступа](docs/access-control.md) · [Backend](backend/README.md) · [Frontend](frontend/README.md).
+
+`preview` предназначен для локальной проверки сборки. Для публикации нужен
+[адаптер TanStack Start](https://tanstack.com/start/latest/docs/framework/react/guide/hosting)
+и FastAPI; одного статического `dist/client` недостаточно для Better Auth.
