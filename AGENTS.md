@@ -56,7 +56,11 @@ follows `dev`, prod follows `main` (kit: `hack-setup install/deploy/`).
 `sandbox_mode = "danger-full-access"`, `web_search = "live"`, agents
 off, hooks on, the six MCP servers (serena/shadcn/context7/grep/
 deepwiki/keenable). `.codex/hooks.json` injects the hack-mode ruleset
-at session start and a STATUS line per prompt.
+at session start and a STATUS line per prompt. Hooks only run while
+their `trusted_hash` in `~/.codex/config.toml` matches the definition —
+after pulling hook changes run
+`python3 <hack-setup>/scripts/repair_setup.py --root . --only hook-trust`
+(ADR 0016 in hack-setup).
 
 Lane enforcement is mechanical: `.codex/lanes.json` declares protected
 branches and the PreToolUse hook denies `git push` to them and
