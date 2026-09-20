@@ -1,0 +1,6 @@
+{
+  "protected_branches": ["dev", "main"],
+  "lane": "feat/<issue>-<slug> -> <user> -> dev -> main",
+  "orchestrator_marker": ".agent/orchestrator",
+  "note": "workers push only their personal lane; protected pushes and PR merges run from the orchestrator checkout which carries the untracked marker file"
+}

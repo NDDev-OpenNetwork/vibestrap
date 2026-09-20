@@ -57,3 +57,9 @@ follows `dev`, prod follows `main` (kit: `hack-setup install/deploy/`).
 off, hooks on, the six MCP servers (serena/shadcn/context7/grep/
 deepwiki/keenable). `.codex/hooks.json` injects the hack-mode ruleset
 at session start and a STATUS line per prompt.
+
+Lane enforcement is mechanical: `.codex/lanes.json` declares protected
+branches and the PreToolUse hook denies `git push` to them and
+`gh pr merge` from any checkout without the untracked
+`.agent/orchestrator` marker — the orchestrator creates it once in its
+main checkout; worker worktrees never have it.
