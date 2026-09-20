@@ -3,6 +3,7 @@ import { Moon, Sun, Monitor } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { m } from "#/shared/lib/i18n/messages";
+import { useLocale } from "#/shared/lib/locales";
 
 import { Button } from "./shadcn/button";
 
@@ -13,9 +14,13 @@ function getInitialMode(): ThemeMode {
     return "auto";
   }
 
-  const stored = window.localStorage.getItem("theme");
-  if (stored === "light" || stored === "dark" || stored === "auto") {
-    return stored;
+  try {
+    const stored = window.localStorage.getItem("theme");
+    if (stored === "light" || stored === "dark" || stored === "auto") {
+      return stored;
+    }
+  } catch {
+    // Browsers may block storage; system appearance remains available.
   }
 
   return "auto";
@@ -44,6 +49,7 @@ function applyThemeMode(mode: ThemeMode) {
 }
 
 function ThemeToggleContent() {
+  const locale = useLocale();
   const [mode, setMode] = useState<ThemeMode>(getInitialMode);
 
   useEffect(() => {
@@ -70,16 +76,20 @@ function ThemeToggleContent() {
     const nextMode: ThemeMode =
       mode === "light" ? "dark" : mode === "dark" ? "auto" : "light";
     setMode(nextMode);
-    window.localStorage.setItem("theme", nextMode);
+    try {
+      window.localStorage.setItem("theme", nextMode);
+    } catch {
+      // Keep the selected appearance for this visit.
+    }
   }
 
   const modeLabel =
     mode === "auto"
-      ? m.app_theme_auto()
+      ? m.app_theme_auto({}, { locale })
       : mode === "dark"
-        ? m.app_theme_dark()
-        : m.app_theme_light();
-  const label = m.app_theme_label({ mode: modeLabel });
+        ? m.app_theme_dark({}, { locale })
+        : m.app_theme_light({}, { locale });
+  const label = m.app_theme_label({ mode: modeLabel }, { locale });
 
   return (
     <Button

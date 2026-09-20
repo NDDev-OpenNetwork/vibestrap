@@ -7,6 +7,9 @@ import type { ReactNode } from "react";
 import { authClient } from "#/shared/auth";
 import { env } from "#/shared/config";
 import { m } from "#/shared/lib/i18n/messages";
+import type { Locale } from "#/shared/lib/i18n/runtime";
+import { useLocale } from "#/shared/lib/locales";
+import { A11yPanel } from "#/shared/ui/a11y-panel";
 import LocaleSwitcher from "#/shared/ui/locale-switcher";
 import { Button } from "#/shared/ui/shadcn/button";
 import {
@@ -21,14 +24,23 @@ import ThemeToggle from "#/shared/ui/theme-toggle";
 type NavigationItem = {
   to: "/" | "/notes";
   icon: LucideIcon;
-  label: () => string;
+  label: (locale: Locale) => string;
   exact?: boolean;
 };
 
 /** Add a page here and it appears in the sidebar, the mobile menu and the header title. */
 const navigation: NavigationItem[] = [
-  { to: "/", icon: House, label: () => m.home_page(), exact: true },
-  { to: "/notes", icon: NotebookPen, label: () => m.notes_page() },
+  {
+    to: "/",
+    icon: House,
+    label: (locale) => m.home_page({}, { locale }),
+    exact: true,
+  },
+  {
+    to: "/notes",
+    icon: NotebookPen,
+    label: (locale) => m.notes_page({}, { locale }),
+  },
 ];
 
 const linkClassName =
@@ -38,25 +50,32 @@ const activeProps = {
   "aria-current": "page",
 } as const;
 
-const Navigation = ({ onNavigate }: { onNavigate?: () => void }) => (
-  <nav aria-label={m.app_navigation()} className="grid gap-1 p-3">
-    {navigation.map(({ to, icon: Icon, label, exact }) => (
-      <Link
-        key={to}
-        to={to}
-        onClick={onNavigate}
-        activeOptions={exact ? { exact: true } : undefined}
-        className={linkClassName}
-        activeProps={activeProps}
-      >
-        <Icon className="size-4" aria-hidden="true" />
-        {label()}
-      </Link>
-    ))}
-  </nav>
-);
+const Navigation = ({ onNavigate }: { onNavigate?: () => void }) => {
+  const locale = useLocale();
+  return (
+    <nav
+      aria-label={m.app_navigation({}, { locale })}
+      className="grid gap-1 p-3"
+    >
+      {navigation.map(({ to, icon: Icon, label, exact }) => (
+        <Link
+          key={to}
+          to={to}
+          onClick={onNavigate}
+          activeOptions={exact ? { exact: true } : undefined}
+          className={linkClassName}
+          activeProps={activeProps}
+        >
+          <Icon className="size-4" aria-hidden="true" />
+          {label(locale)}
+        </Link>
+      ))}
+    </nav>
+  );
+};
 
 const useCurrentPageLabel = () => {
+  const locale = useLocale();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -66,10 +85,11 @@ const useCurrentPageLabel = () => {
         pathname === item.to || (!item.exact && pathname.startsWith(item.to))
     )
     .at(-1);
-  return match?.label() ?? m.home_page();
+  return match?.label(locale) ?? m.home_page({}, { locale });
 };
 
 export const AppShell = ({ children }: { children: ReactNode }) => {
+  const locale = useLocale();
   const { data: session } = authClient.useSession();
   const pageLabel = useCurrentPageLabel();
   const navigate = useNavigate();
@@ -97,9 +117,9 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-background focus:p-3 focus:outline-2"
       >
-        {m.app_skip_content()}
+        {m.app_skip_content({}, { locale })}
       </a>
-      <aside className="hidden w-56 shrink-0 border-e bg-sidebar md:block">
+      <aside className="hidden w-56 shrink-0 border-e bg-sidebar lg:block">
         <div className="flex h-14 items-center border-b px-6 text-sm font-semibold">
           {env.VITE_APP_TITLE}
         </div>
@@ -114,8 +134,8 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="md:hidden"
-                    aria-label={m.app_open_menu()}
+                    className="lg:hidden"
+                    aria-label={m.app_open_menu({}, { locale })}
                   />
                 }
               >
@@ -124,7 +144,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
               <SheetContent
                 side="left"
                 showCloseButton={false}
-                className="w-64 gap-0 bg-sidebar"
+                className="w-64 max-w-[calc(100%-2rem)] gap-0 overflow-y-auto overscroll-contain bg-sidebar"
               >
                 <div className="flex min-h-14 items-center justify-between border-b px-4">
                   <SheetTitle>{env.VITE_APP_TITLE}</SheetTitle>
@@ -133,7 +153,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={m.app_close_menu()}
+                        aria-label={m.app_close_menu({}, { locale })}
                       />
                     }
                   >
@@ -145,16 +165,17 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
             </Sheet>
             <span className="text-sm text-muted-foreground">{pageLabel}</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex max-w-full min-w-0 flex-wrap items-center gap-1">
             <LocaleSwitcher />
             <ThemeToggle />
-            <span className="mx-2 hidden max-w-40 truncate text-sm sm:block">
+            <A11yPanel />
+            <span className="mx-2 hidden max-w-40 truncate text-sm lg:block">
               {session?.user.name}
             </span>
             <Button
               variant="ghost"
               size="icon"
-              aria-label={m.auth_signout()}
+              aria-label={m.auth_signout({}, { locale })}
               disabled={signingOut}
               onClick={() => {
                 void signOut();
@@ -166,7 +187,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
         </header>
         {error && (
           <p role="alert" className="px-6 pt-4 text-sm text-destructive">
-            {m.auth_network_error()}
+            {m.auth_network_error({}, { locale })}
           </p>
         )}
         <main id="main-content" tabIndex={-1} className="p-4 sm:p-6">

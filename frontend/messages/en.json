@@ -49,5 +49,22 @@
   "notes_pin": "Pin",
   "notes_title_label": "Title",
   "notes_title_required": "Enter a title",
-  "notes_unpin": "Unpin"
+  "notes_unpin": "Unpin",
+  "a11y_open": "Accessibility",
+  "a11y_close": "Close settings",
+  "a11y_font_size": "Text size",
+  "a11y_scheme": "Color scheme",
+  "a11y_scheme_default": "Standard",
+  "a11y_scheme_contrast": "White on black",
+  "a11y_images": "Images",
+  "a11y_images_normal": "Normal",
+  "a11y_images_grayscale": "Grayscale",
+  "a11y_images_hidden": "Hidden",
+  "a11y_contrast": "Increase contrast",
+  "a11y_spacing": "Increase spacing",
+  "a11y_motion": "Reduce motion",
+  "a11y_speech": "Read selected text aloud",
+  "a11y_speech_help": "Select text to hear it. Voices depend on your browser and language.",
+  "a11y_speech_unavailable": "Read aloud is unavailable in this browser.",
+  "a11y_reset": "Reset settings"
 }

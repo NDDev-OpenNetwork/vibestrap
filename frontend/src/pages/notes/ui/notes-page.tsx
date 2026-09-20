@@ -18,6 +18,7 @@ import {
   updateNoteMutation,
 } from "#/shared/api";
 import { m } from "#/shared/lib/i18n/messages";
+import { useLocale } from "#/shared/lib/locales";
 import { Badge } from "#/shared/ui/shadcn/badge";
 import { Button } from "#/shared/ui/shadcn/button";
 import {
@@ -33,7 +34,7 @@ import { Textarea } from "#/shared/ui/shadcn/textarea";
 import { toast } from "#/shared/ui/shadcn/toast";
 
 const noteSchema = z.object({
-  title: z.string().trim().min(1, m.notes_title_required()).max(200),
+  title: z.string().trim().min(1, "notes_title_required").max(200),
   body: z.string().trim().max(10_000),
 });
 type NoteValues = z.infer<typeof noteSchema>;
@@ -46,6 +47,7 @@ export const notesQuery = (pinned: boolean | null) =>
   });
 
 export const NotesPage = () => {
+  const locale = useLocale();
   const [pinned, setPinned] = useState<boolean | null>(null);
   // `useSuspenseQuery` suspends when the key changes; a transition keeps the current
   // list on screen instead of dropping the whole route into its pending state.
@@ -70,7 +72,7 @@ export const NotesPage = () => {
     ...createNoteMutation({ client: backendClient }),
     onSuccess: async () => {
       form.reset();
-      toast.add({ type: "success", title: m.notes_created() });
+      toast.add({ type: "success", title: m.notes_created({}, { locale }) });
       await refresh();
     },
   });
@@ -81,7 +83,7 @@ export const NotesPage = () => {
   const remove = useMutation({
     ...deleteNoteMutation({ client: backendClient }),
     onSuccess: async () => {
-      toast.add({ type: "success", title: m.notes_deleted() });
+      toast.add({ type: "success", title: m.notes_deleted({}, { locale }) });
       await refresh();
     },
   });
@@ -93,8 +95,10 @@ export const NotesPage = () => {
   });
 
   return (
-    <div className="mx-auto grid w-full max-w-2xl gap-6">
-      <h1 className="text-xl font-semibold tracking-tight">{m.notes_page()}</h1>
+    <div className="mx-auto grid w-full max-w-2xl min-w-0 grid-cols-1 gap-6">
+      <h1 className="text-xl font-semibold tracking-tight">
+        {m.notes_page({}, { locale })}
+      </h1>
 
       <Card>
         <CardContent>
@@ -106,33 +110,53 @@ export const NotesPage = () => {
           >
             <Field data-invalid={Boolean(form.formState.errors.title)}>
               <FieldLabel htmlFor="note-title">
-                {m.notes_title_label()}
+                {m.notes_title_label({}, { locale })}
               </FieldLabel>
               <Input
                 id="note-title"
+                maxLength={200}
+                aria-describedby={
+                  form.formState.errors.title ? "note-title-error" : undefined
+                }
                 aria-invalid={Boolean(form.formState.errors.title)}
                 {...form.register("title")}
               />
-              <FieldError errors={[form.formState.errors.title]} />
+              <FieldError
+                id="note-title-error"
+                errors={[
+                  form.formState.errors.title && {
+                    message:
+                      form.formState.errors.title.message ===
+                      "notes_title_required"
+                        ? m.notes_title_required({}, { locale })
+                        : form.formState.errors.title.message,
+                  },
+                ]}
+              />
             </Field>
             <Field>
               <FieldLabel htmlFor="note-body">
-                {m.notes_body_label()}
+                {m.notes_body_label({}, { locale })}
               </FieldLabel>
-              <Textarea id="note-body" rows={3} {...form.register("body")} />
+              <Textarea
+                id="note-body"
+                rows={3}
+                maxLength={10_000}
+                {...form.register("body")}
+              />
             </Field>
             <Button
               className="justify-self-start"
               type="submit"
               disabled={create.isPending}
             >
-              {m.notes_create()}
+              {m.notes_create({}, { locale })}
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      <div aria-busy={isSwitching} className="flex gap-1">
+      <div aria-busy={isSwitching} className="flex flex-wrap gap-1">
         <Button
           size="sm"
           variant={pinned === null ? "secondary" : "ghost"}
@@ -140,7 +164,7 @@ export const NotesPage = () => {
             showFilter(null);
           }}
         >
-          {m.notes_all()}
+          {m.notes_all({}, { locale })}
         </Button>
         <Button
           size="sm"
@@ -149,13 +173,13 @@ export const NotesPage = () => {
             showFilter(true);
           }}
         >
-          {m.notes_only_pinned()}
+          {m.notes_only_pinned({}, { locale })}
         </Button>
       </div>
 
       {notes.data.items.length === 0 ? (
         <Empty>
-          <EmptyDescription>{m.notes_empty()}</EmptyDescription>
+          <EmptyDescription>{m.notes_empty({}, { locale })}</EmptyDescription>
         </Empty>
       ) : (
         <ul
@@ -165,18 +189,27 @@ export const NotesPage = () => {
           {notes.data.items.map((note) => (
             <li key={note.id}>
               <Card>
-                <CardHeader className="flex flex-row items-start justify-between gap-2">
+                <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-2">
                   <CardTitle className="min-w-0 break-words">
                     {note.title}
                   </CardTitle>
-                  <div className="flex shrink-0 items-center gap-1">
+                  <div className="flex max-w-full flex-wrap items-center gap-1">
                     {note.pinned && (
-                      <Badge variant="secondary">{m.notes_only_pinned()}</Badge>
+                      <Badge
+                        variant="secondary"
+                        className="h-auto whitespace-normal"
+                      >
+                        {m.notes_only_pinned({}, { locale })}
+                      </Badge>
                     )}
                     <Button
                       size="icon"
                       variant="ghost"
-                      aria-label={note.pinned ? m.notes_unpin() : m.notes_pin()}
+                      aria-label={
+                        note.pinned
+                          ? m.notes_unpin({}, { locale })
+                          : m.notes_pin({}, { locale })
+                      }
                       disabled={update.isPending}
                       onClick={() => {
                         update.mutate({
@@ -194,7 +227,7 @@ export const NotesPage = () => {
                     <Button
                       size="icon"
                       variant="ghost"
-                      aria-label={m.notes_delete()}
+                      aria-label={m.notes_delete({}, { locale })}
                       disabled={remove.isPending}
                       onClick={() => {
                         remove.mutate({ path: { note_id: note.id } });

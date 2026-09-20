@@ -61,6 +61,7 @@ problem+json: он даёт один типизированный `ErrorResponse
 | Кеш и сессии | `AuthCacheBoundary` чистит кеш при logout и смене сессии. Ключи вручную не скоупить |
 | Загрузка данных | `loader: ensureQueryData(...)` в роуте + `useSuspenseQuery(...)` в компоненте |
 | Формы | `react-hook-form` + `zodResolver`, поля через `Field`/`FieldLabel`/`FieldError` |
+| Переводы | `useLocale()` + `m.key(inputs, { locale })` в render; `changeLocale()` меняет cookie без reload и потери форм. `m.key()` без locale — для обработчиков вне React |
 | Ошибки мутаций | Глобальный toast из `MutationCache`. Свой `onError` отключает его |
 | Ошибки запросов | `RouteError`; `AccessDeniedError` рисует отдельный экран 403 |
 | Компоненты | `bun run --cwd frontend ui:add <name>` (Base UI, реестр `base-vega`) |

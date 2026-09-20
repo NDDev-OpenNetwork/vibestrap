@@ -49,5 +49,22 @@
   "notes_pin": "Бекіту",
   "notes_title_label": "Тақырып",
   "notes_title_required": "Тақырыпты енгізіңіз",
-  "notes_unpin": "Босату"
+  "notes_unpin": "Босату",
+  "a11y_open": "Арнайы мүмкіндіктер",
+  "a11y_close": "Баптауларды жабу",
+  "a11y_font_size": "Мәтін өлшемі",
+  "a11y_scheme": "Түс схемасы",
+  "a11y_scheme_default": "Қалыпты",
+  "a11y_scheme_contrast": "Қара фонда ақ мәтін",
+  "a11y_images": "Суреттер",
+  "a11y_images_normal": "Қалыпты",
+  "a11y_images_grayscale": "Ақ-қара",
+  "a11y_images_hidden": "Жасырын",
+  "a11y_contrast": "Контрастты күшейту",
+  "a11y_spacing": "Аралықтарды үлкейту",
+  "a11y_motion": "Анимацияны азайту",
+  "a11y_speech": "Белгіленген мәтінді дыбыстау",
+  "a11y_speech_help": "Тыңдау үшін мәтінді белгілеңіз. Дауыс браузер мен тілге байланысты.",
+  "a11y_speech_unavailable": "Бұл браузерде дыбыстау қолжетімсіз.",
+  "a11y_reset": "Баптауларды қалпына келтіру"
 }

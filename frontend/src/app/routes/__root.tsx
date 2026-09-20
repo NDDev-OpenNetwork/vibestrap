@@ -1,15 +1,18 @@
 import type { QueryClient } from "@tanstack/react-query";
 import {
+  ClientOnly,
   HeadContent,
   Scripts,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
-import { useEffect } from "react";
 import type { ReactNode } from "react";
 
 import { AuthCacheBoundary } from "#/shared/auth";
 import { env } from "#/shared/config";
-import { getLocale } from "#/shared/lib/i18n/runtime";
+import { A11Y_INIT_SCRIPT } from "#/shared/lib/a11y-settings";
+import { getTextDirection } from "#/shared/lib/i18n/runtime";
+import { useLocale } from "#/shared/lib/locales";
+import { A11yRuntime } from "#/shared/ui/a11y-runtime";
 
 import appCss from "#/app/styles/globals.css?url";
 
@@ -34,16 +37,18 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 });
 
 function RootDocument({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    document.documentElement.lang = getLocale();
-  }, []);
+  const locale = useLocale();
   return (
-    <html lang={getLocale()} suppressHydrationWarning>
+    <html lang={locale} dir={getTextDirection(locale)} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: A11Y_INIT_SCRIPT }} />
         <HeadContent />
       </head>
       <body>
+        <ClientOnly>
+          <A11yRuntime />
+        </ClientOnly>
         <AuthCacheBoundary>{children}</AuthCacheBoundary>
         <Scripts />
       </body>
