@@ -1,0 +1,31 @@
+{
+  "description": "hack-mode lifecycle: inject the ruleset at session start and keep a one-line reminder + git/issues STATUS per prompt. Mirrored from hack-setup .codex/hooks.json (law: hack-setup build/stack-pin.json registered.hooks).",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/hack_mode.py session",
+            "timeout": 5,
+            "statusMessage": "Loading hack mode",
+            "additionalContextLimit": 12000
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/hack_mode.py prompt",
+            "timeout": 5,
+            "statusMessage": "hack mode"
+          }
+        ]
+      }
+    ]
+  }
+}

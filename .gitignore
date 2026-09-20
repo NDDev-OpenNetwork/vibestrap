@@ -5,3 +5,5 @@
 !.env.example
 node_modules/
 .claude/settings.local.json
+.agent/briefs/
+__pycache__/

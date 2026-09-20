@@ -24,3 +24,36 @@
 - Business data: FastAPI `backend/src/vibestrap/modules`, SQLAlchemy/Alembic `app` schema. Better Auth/Drizzle owns only `auth`.
 - Read `docs/access-control.md` for auth changes. Regenerate contract and client after API changes; never hand-edit generated sources.
 - Keep instructions brief and repo-specific.
+
+# Hackathon workflow (Saint Tibo)
+
+Lanes: `feat/<issue>-<slug>` → `<user>` (`danil`/`ivan`/`artem`) → `dev`
+→ `main`. Workers merge only into their own `<user>` lane and push it;
+never push `dev` or `main` yourself. The orchestrator chat merges
+`<user>` → `dev` behind the merge gate and ships `dev` → `main` only on
+the owner's word. Deploys are server-side pull watchers: the dev server
+follows `dev`, prod follows `main` (kit: `hack-setup install/deploy/`).
+
+- Orchestration: the main Codex App chat spawns worker threads with
+  `codex_app.*` task tools — `create_thread {prompt≤1000B, title?,
+  model?}` (thread inherits cwd; brief file at `.agent/briefs/*.md`),
+  `wait_threads`, `read_thread`, `send_message_to_thread`. Not
+  subagents. Full playbook: `$hack-agent-workflow:delegate-worker`.
+- Rules live in `$hack-agent-workflow:` skills — `github-flow` (lanes +
+  merge gate), `hack-mode` (laziest working solution, no review round,
+  no test suite, `hack:` markers), `ship-verify` (build on the server,
+  check live — done means live), `debt-ledger`, `session-boot`,
+  `agent-handoff`. Plugins install from the `hack-setup` marketplace.
+- Issues are the source of truth: claim files in an issue comment
+  before editing; `done: <sha>` comment when merged to your lane.
+- Commits are expected on feat and `<user>` branches as part of the
+  loop; the no-commits rule above applies only outside hackathon work.
+
+# Codex surface
+
+`.codex/config.toml` mirrors `hack-setup` law: `gpt-6-astra` /
+`gpt-5.6-sol` at `xhigh`, `approval_policy = "never"`,
+`sandbox_mode = "danger-full-access"`, `web_search = "live"`, agents
+off, hooks on, the six MCP servers (serena/shadcn/context7/grep/
+deepwiki/keenable). `.codex/hooks.json` injects the hack-mode ruleset
+at session start and a STATUS line per prompt.
