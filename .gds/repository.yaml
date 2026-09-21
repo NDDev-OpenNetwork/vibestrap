@@ -1,0 +1,92 @@
+schema_version: 1
+
+repository:
+  id: "repo_01M31VT2VXJ1V8S1SMKVZKHD2W"
+  display_name: "vibestrap"
+  roles:
+    - "project"
+    - "module"
+  lifecycle: "active"
+
+provider:
+  type: "github"
+  installation: "installation:github-opennetwork"
+  repository_id: 1378807620
+  owner: "NDDev-OpenNetwork"
+  name: "vibestrap"
+
+classification:
+  portfolios:
+    - "portfolio:opennetwork-projects"
+  visibility_contract: "private"
+  data_classification: "private"
+
+product:
+  purpose: >-
+    The Saint Tibo hackathon product skeleton, adapted from the public
+    R3flector/vibestrap starter: a Bun/TypeScript frontend, a FastAPI
+    backend and PostgreSQL, being finished under the hack-setup operating
+    contract. Registered 2026-09-21 while still private so that hack-setup
+    can consume it as a git submodule; on event day the product moves to
+    the hackathon organization repository.
+  capabilities:
+    - "Bun 1.4.2 TypeScript frontend (React 19 + Vite) with generated API client"
+    - "FastAPI backend with SQLAlchemy/Alembic on PostgreSQL, Better Auth, seeded demo data"
+    - "hackathon lane workflow: feat/<issue>-<slug> -> <user> -> dev -> main"
+  entrypoints:
+    - change: "what this repository is and what it may do"
+      path: ".gds/repository.yaml"
+    - change: "project conventions and workspace commands"
+      path: "AGENTS.md"
+    - change: "the domain, API and i18n conventions a feature touches"
+      path: "docs/conventions.md"
+
+# `opennetwork-default` is not assignable: its policy match requires
+# `visibility_contract: public`. The standard private-owner pairing applies,
+# matching `platform-sources` assignments under NDDev-Platform.
+policy:
+  profiles:
+    - "repository-default"
+    - "organization-default"
+  rollout_ring: "standard"
+
+git:
+  default_branch: "main"
+  integration: "pull-request"
+  branch_model: "task-branches"
+  handoff_pr: "preferred"
+  cleanup: "merged-only"
+
+agent:
+  context_profile: "project-default"
+  generated_agents: false
+  serena:
+    enabled: false
+    provenance_required: false
+
+# Consumed by hack-setup through a gitlink at `product/vibestrap`; per
+# ADR 0027 it materializes only inside that superproject checkout and gets no
+# standalone device checkout.
+module:
+  contract: "private"
+  consumption:
+    - "git-submodule"
+  compatibility: "none"
+  pin_policy: "default-branch-commit"
+  publication:
+    registry: "none"
+    github_release: "disabled"
+
+verification:
+  commands:
+    lint: ["bun run check"]
+    test: ["bun run test"]
+    build: ["bun run build"]
+    full: ["bun run verify"]
+  required:
+    - "lint"
+    - "test"
+    - "build"
+
+release:
+  mode: "none"
