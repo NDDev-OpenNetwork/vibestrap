@@ -1,0 +1,41 @@
+{
+  "schema": 2,
+  "role": "product-fork-pin",
+  "note": "Thin pin for the vibestrap hackathon template. Law lives in hack-setup's build/stack-pin.json; this file records only what the fork actually ships plus deliberate fork exceptions. Regenerate checkers are not wired here — `bun run verify` is the proof loop.",
+  "runtime": {
+    "bun": "1.4.2",
+    "python": ">=3.13,<3.14",
+    "uv": "managed-by-hack-setup-pin"
+  },
+  "frontend": {
+    "react": "19.3.x",
+    "vite": "8.3.x",
+    "typescript": "7.0.2",
+    "framework": "@tanstack/react-start (SPA mode; Vite-based)",
+    "router": "@tanstack/react-router",
+    "query": "@tanstack/react-query",
+    "forms": "react-hook-form + zodResolver (FORK EXCEPTION — see below)",
+    "schema": "zod 4",
+    "ui": "shadcn 4.21.0 vendored via `bun run ui:add`, Base UI base-vega",
+    "i18n": "ru (default) / kk (label KZ) / en"
+  },
+  "backend": {
+    "framework": "fastapi>=0.141",
+    "orm": "sqlalchemy[asyncio]>=2.0.54 + alembic>=1.20 (schema `app`)",
+    "auth": "better-auth + drizzle-orm (owns ONLY the `auth` schema)",
+    "python_manager": "uv only; uv.lock locked"
+  },
+  "data": {
+    "postgres": "SoT — schemas: `app` (Alembic), `auth` (Drizzle)"
+  },
+  "fork_exceptions": [
+    "react-hook-form + zodResolver instead of TanStack Form: the template ships RHF wired into shadcn Field primitives and docs/conventions.md; migrating before the event is re-solving a solved problem (ponytail). Greenfield non-template code may still use TanStack Form per hack-setup WEB.md.",
+    "@tanstack/react-start instead of bare Vite entry: file-based routing + SSR-capable shell; still Vite 8.3 underneath, so the pin's Vite line holds.",
+    "better-auth/drizzle owns only the `auth` schema: business persistence stays FastAPI+SQLAlchemy+Alembic in `app`. Do not let Drizzle touch `app`.",
+    "bun-only JS runtime, uv-only Python: same law as hack-setup."
+  ],
+  "do_not_use": [
+    "next.js", "pnpm", "npm", "yarn", "typescript@6",
+    "a second JS lockfile", "drizzle over the `app` schema"
+  ]
+}

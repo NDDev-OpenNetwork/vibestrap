@@ -8,3 +8,13 @@ node_modules/
 .agent/
 
 __pycache__/
+
+# Serena durable state is committed; transient caches are not
+.serena/cache/
+.serena/reviews/
+.serena/diagnostics/
+.serena/.flow_*
+.serena/.serena_sync_state.json
+.serena/.auto_sync_head
+.serena/.dirty_stop_ack
+.serena/.sync_marker

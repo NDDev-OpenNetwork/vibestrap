@@ -1,0 +1,32 @@
+# Vibestrap Serena project — minimal durable state for the hackathon
+# template. Memories are per-domain: .serena/memories/<DOMAIN>-NN-<topic>.md
+# (API / WEB / DB / AUTH / INFRA / MODELS). Plans live in
+# .serena/plans/NEXT-SESSION.md.
+project_name: "vibestrap"
+encoding: "utf-8"
+line_ending:
+language_backend:
+ignore_all_files_in_gitignore: true
+ls_specific_settings: {}
+ignored_paths:
+- "frontend/node_modules/**"
+- "backend/.venv/**"
+- "frontend/.output/**"
+- "frontend/.tanstack/**"
+- "**/dist/**"
+read_only: false
+excluded_tools: []
+read_only_memory_patterns: []
+ignored_memory_patterns: []
+# Pinned analyzer ids (Serena 1.7.0): python_ty = pinned `ty` for the
+# FastAPI backend; typescript_vts navigates the frontend (it bundles its
+# own tsserver — navigation engine, not the TS 7.0.2 compiler; typecheck
+# proof stays `bun run typecheck`).
+language_servers:
+- python_ty
+- typescript_vts
+- bash
+- yaml
+- toml
+- markdown
+- json

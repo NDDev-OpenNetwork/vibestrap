@@ -25,6 +25,22 @@
 - Read `docs/access-control.md` for auth changes. Regenerate contract and client after API changes; never hand-edit generated sources.
 - Keep instructions brief and repo-specific.
 
+# Fork exceptions (vs hack-setup standards)
+
+This template deliberately deviates from the generic hack-setup pin.
+Each exception is recorded in `build/stack-pin.json` — these are settled
+decisions, not drift:
+
+- **react-hook-form + zodResolver** instead of TanStack Form: RHF is
+  already wired into the shadcn `Field` primitives and
+  `docs/conventions.md`; do not migrate mid-event.
+- **@tanstack/react-start** (SPA) instead of a bare Vite entry: still
+  Vite 8.3 + React 19.3 + TS 7.0.2 underneath — the pin lines hold.
+- **better-auth/drizzle** owns only the PostgreSQL `auth` schema.
+  Business persistence stays FastAPI + SQLAlchemy/Alembic in `app`;
+  never let Drizzle touch `app`.
+- **bun-only / uv-only** is not an exception — same law as hack-setup.
+
 # Hackathon workflow (Saint Tibo)
 
 Lanes: `feat/<issue>-<slug>` → `<user>` (`danil`/`ivan`/`artem`) → `dev`
