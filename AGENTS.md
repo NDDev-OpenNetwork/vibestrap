@@ -70,7 +70,7 @@ server follows `main` (kit: `hack-setup install/deploy/`).
 # Codex surface
 
 `.codex/config.toml` mirrors `hack-setup` law: `gpt-6-astra` /
-`gpt-5.6-sol` at `xhigh`, `approval_policy = "never"`,
+`gpt-6-sol` at `xhigh`, `approval_policy = "never"`,
 `sandbox_mode = "danger-full-access"`, `web_search = "live"`, agents
 off, hooks on, the six MCP servers (serena/shadcn/context7/grep/
 deepwiki/keenable). `.codex/hooks.json` injects the hack-mode ruleset
@@ -93,5 +93,7 @@ main checkout; worker worktrees never have it. `dev` is shared.
 MCP servers), `hooks.v1.json` → `.devin/hooks/devin_mode.py` (ruleset,
 STATUS line, and the same lane guard — it reads `.codex/lanes.json`).
 Model and session law come from the Devin user config managed by
-`devin-setup/./setup`. Skills: `/hack-devin-workflow:<skill>`; workers
+`devin-setup/./setup`: `swe-2-max` ONLY — the hook blocks agent-launched
+`devin --model <other>` / `DEVIN_MODEL=<other>`; never `/model`,
+`/fusion` or Adaptive. Devin attribution is off (no AI trailers). Skills: `/hack-devin-workflow:<skill>`; workers
 are real Devin sessions in herdr panes, not subagents.
