@@ -44,11 +44,13 @@ decisions, not drift:
 # Hackathon workflow (Saint Tibo)
 
 Lanes: `feat/<issue>-<slug>` → `<user>` (`danil`/`ivan`/`artem`) → `dev`
-→ `main`. Workers merge only into their own `<user>` lane and push it;
-never push `dev` or `main` yourself. The orchestrator chat merges
-`<user>` → `dev` behind the merge gate and ships `dev` → `main` only on
-the owner's word. Deploys are server-side pull watchers: the dev server
-follows `dev`, prod follows `main` (kit: `hack-setup install/deploy/`).
+→ `main`. Each member merges their own `<user>` lane into `dev`
+themselves: pull `dev`, make the merge green, `git merge --no-ff`, push,
+verify on their own dev server. Only `dev` → `main` is gated — the
+integrator (Danil) ships it. Merges keep full history: `--no-ff` only,
+never squash or rebase merges (hooks deny them). Deploys are server-side
+pull watchers: each member's dev server follows `dev`, the single prod
+server follows `main` (kit: `hack-setup install/deploy/`).
 
 - Orchestration: the main Codex App chat spawns worker threads with
   `codex_app.*` task tools — `create_thread {prompt≤1000B, title?,
@@ -56,7 +58,7 @@ follows `dev`, prod follows `main` (kit: `hack-setup install/deploy/`).
   `wait_threads`, `read_thread`, `send_message_to_thread`. Not
   subagents. Full playbook: `$hack-agent-workflow:delegate-worker`.
 - Rules live in `$hack-agent-workflow:` skills — `github-flow` (lanes +
-  merge gate), `hack-mode` (laziest working solution, no review round,
+  release gate), `hack-mode` (laziest working solution, no review round,
   no test suite, `hack:` markers), `ship-verify` (build on the server,
   check live — done means live), `debt-ledger`, `session-boot`,
   `agent-handoff`. Plugins install from the `hack-setup` marketplace.
@@ -78,8 +80,18 @@ after pulling hook changes run
 `python3 <hack-setup>/scripts/repair_setup.py --root . --only hook-trust`
 (ADR 0016 in hack-setup).
 
-Lane enforcement is mechanical: `.codex/lanes.json` declares protected
-branches and the PreToolUse hook denies `git push` to them and
+Lane enforcement is mechanical: `.codex/lanes.json` declares `main`
+protected and the PreToolUse hook denies `git push` to it and
 `gh pr merge` from any checkout without the untracked
-`.agent/orchestrator` marker — the orchestrator creates it once in its
-main checkout; worker worktrees never have it.
+`.agent/orchestrator` marker — the integrator creates it once in his
+main checkout; worker worktrees never have it. `dev` is shared.
+
+# Devin surface
+
+`.devin/` mirrors `hack-setup/devin-setup` law: `config.json`
+(permissions, `read_config_from` off), `mcp_config.json` (the same six
+MCP servers), `hooks.v1.json` → `.devin/hooks/devin_mode.py` (ruleset,
+STATUS line, and the same lane guard — it reads `.codex/lanes.json`).
+Model and session law come from the Devin user config managed by
+`devin-setup/./setup`. Skills: `/hack-devin-workflow:<skill>`; workers
+are real Devin sessions in herdr panes, not subagents.
